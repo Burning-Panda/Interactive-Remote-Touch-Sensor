@@ -1,4 +1,5 @@
 # client.py
+# Initial Imports
 import socket
 from time import sleep
 import serial
@@ -16,6 +17,7 @@ ard_usb = '/dev/ttyUSB0'
 ser = serial.Serial(ard_usb, 9600, timeout=.1)
 ser.flush()
 
+# Initial Global variables.
 status = '0'
 printed = '0'
 co_sofa = '0'
@@ -24,22 +26,30 @@ co_sofa = '0'
 stst = '3'
 ststt = '4'
 
-
+# Read the arduino serial. Runs in a different thread to allow for faster and more accurate read speeds.
 def read():
-    # Arduino reads this in a another thread for to optimize for speed.
     global status
     global ser
 
     while True:
+        # Check if arduino is plugged in, else ignore.
         if ser.in_waiting > 0:
+             # Reads line and converts it to UTF-8
             line = ser.readline().decode('utf-8').rstrip()
-            status = line
+            
+            # Make sure that it reads the correct numbers. Anything above 1 should be ignored.
+            if int(line) <= 2:
+                status = line
 
 
 def updateCo(x):
     global co_sofa
+    
+    # Checks if the variable is the same, to minimize the amount of blinking on the arduino.
     if co_sofa != x:
         co_sofa = x
+        
+        # Writes to the arduino and updates the light, if it should be on or off.
         encoded = co_sofa.encode()
         ser.write(encoded)
 
@@ -63,7 +73,7 @@ def conne(x):
     decoded = tm.decode('ascii')
 
     if decoded != co_sofa:
-        print(decoded)
+        # print(decoded)
         updateCo(decoded)
 
 
@@ -72,7 +82,7 @@ arduinoRead = Thread(target=read)
 arduinoRead.start()
 
 while True:
-    print(status)
+    # print(status)
     if status is '1':
         conne(stst)
     else:
