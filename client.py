@@ -75,8 +75,6 @@ while True:
     print(status)
     if status is '1':
         conne(stst)
-    elif status is '0':
-        conne(ststt)
     else:
         conne(ststt)
 
