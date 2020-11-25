@@ -80,4 +80,4 @@ while True:
     else:
         conne(ststt)
 
-    sleep(1)
+    sleep(.5)
